@@ -1,10 +1,10 @@
-const tv = require('term-vector')
-const { ngraminator } = require('ngraminator')
+import tv from 'term-vector'
+import { ngraminator } from 'ngraminator'
 
-const SPLIT = ([tokens, field, ops]) =>
+export const SPLIT = ([tokens, field, ops]) =>
   Promise.resolve([tokens.match(ops.tokenSplitRegex) || [], field, ops])
 
-const SKIP = ([tokens, field, ops]) => [
+export const SKIP = ([tokens, field, ops]) => [
   ops.skipFields.includes(field) ? [] : tokens,
   field,
   ops
@@ -17,7 +17,9 @@ const LOWCASE = ([tokens, field, ops]) =>
     ops
   ])
 
-const REPLACE = ([tokens, field, ops]) => {
+export { LOWCASE as LOWACASE } 
+
+export const REPLACE = ([tokens, field, ops]) => {
   const { fields, values } = ops.replace
   const replace = () =>
     tokens.reduce((acc, cur) => [cur, ...acc, ...(values[cur] || [])], [])
@@ -27,7 +29,7 @@ const REPLACE = ([tokens, field, ops]) => {
   return Promise.resolve([tokens, field, ops])
 }
 
-const NGRAMS = ([tokens, field, ops]) => {
+export const NGRAMS = ([tokens, field, ops]) => {
   let { fields, lengths, join = ' ' } = ops.ngrams
   // if no fields are specified then ngramify all fields
   if (!fields) fields = [field]
@@ -47,7 +49,7 @@ const NGRAMS = ([tokens, field, ops]) => {
   return Promise.resolve([tokens, field, ops])
 }
 
-const STOPWORDS = ([tokens, field, ops]) => {
+export const STOPWORDS = ([tokens, field, ops]) => {
   return [
     tokens.filter(t => !ops.stopwords.includes(t.toLowerCase())),
     field,
@@ -55,7 +57,7 @@ const STOPWORDS = ([tokens, field, ops]) => {
   ]
 }
 
-const SCORE_TERM_FREQUENCY = ([tokens, field, ops]) => {
+export const SCORE_TERM_FREQUENCY = ([tokens, field, ops]) => {
   const v = tv(tokens)
   const mostTokenOccurances = v.reduce(
     (acc, cur) => Math.max(cur.positions.length, acc),
@@ -77,7 +79,7 @@ const SCORE_TERM_FREQUENCY = ([tokens, field, ops]) => {
   ])
 }
 
-exports.SPY = ([tokens, field, ops]) => {
+export const SPY = ([tokens, field, ops]) => {
   console.log('----------------')
   console.log('field ->')
   console.log(field)
@@ -87,7 +89,7 @@ exports.SPY = ([tokens, field, ops]) => {
   return Promise.resolve([tokens, field, ops])
 }
 
-exports.tokenizer = (tokens, field, ops) =>
+export const tokenizer = (tokens, field, ops) =>
   SPLIT([tokens, field, ops])
     .then(SKIP)
     .then(LOWCASE)
@@ -96,11 +98,3 @@ exports.tokenizer = (tokens, field, ops) =>
     .then(STOPWORDS)
     .then(SCORE_TERM_FREQUENCY)
     .then(([tokens, field, ops]) => tokens)
-
-exports.SPLIT = SPLIT
-exports.SKIP = SKIP
-exports.LOWACASE = LOWCASE
-exports.REPLACE = REPLACE
-exports.NGRAMS = NGRAMS
-exports.STOPWORDS = STOPWORDS
-exports.SCORE_TERM_FREQUENCY = SCORE_TERM_FREQUENCY

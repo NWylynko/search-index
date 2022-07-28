@@ -1,12 +1,14 @@
 // TODO: remove all '￮' and '#'
 
-const { EntryStream } = require('level-read-stream')
+import { EntryStream } from 'level-read-stream'
+import type { AllDocumentsResultItem, SearchIndexOptions } from './types'
+import type LRU from 'lru-cache'
 
-module.exports = (ops, cache) => {
+const reader = (ops: SearchIndexOptions, cache: LRU<unknown, unknown>) => {
   // TODO add aggregation to ALL_DOCUMENTS
-  const ALL_DOCUMENTS = limit =>
+  const ALL_DOCUMENTS = (limit?: number) =>
     new Promise((resolve, reject) => {
-      const result = []
+      const result: AllDocumentsResultItem[] = []
       new EntryStream(ops.fii.STORE, {
         // gte: null,
         // lte: undefined,
@@ -431,3 +433,5 @@ module.exports = (ops, cache) => {
     SORT
   }
 }
+
+export default reader

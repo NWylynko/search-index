@@ -1,4 +1,6 @@
-module.exports = ops => {
+import type { SearchIndexOptions } from './types'
+
+const DocumentProcessor = (ops: SearchIndexOptions) => {
   const isObject = item =>
     typeof item === 'object' && item !== null && !Array.isArray(item)
 
@@ -37,30 +39,30 @@ module.exports = ops => {
       return resolve(unknown)
     })
 
-  const processDocument = async doc =>
-    // eslint-disable-next-line
-    new Promise(async resolve => {
-      // Documents that are Strings are converted into { body: ... }
-      if (isString(doc)) doc = { body: doc }
+  const processDocument = async (doc) => {
+    // Documents that are Strings are converted into { body: ... }
+    if (isString(doc)) doc = { body: doc }
 
-      // Docs with no _id are auto-assigned an ID
-      // if (!doc.hasOwnProperty('_id')) doc._id = ops.idGenerator.next().value
-      if (!Object.prototype.hasOwnProperty.call(doc, '_id')) {
-        doc._id = ops.idGenerator.next().value
-      }
+    // Docs with no _id are auto-assigned an ID
+    // if (!doc.hasOwnProperty('_id')) doc._id = ops.idGenerator.next().value
+    if (!Object.prototype.hasOwnProperty.call(doc, '_id')) {
+      doc._id = ops.idGenerator.next().value
+    }
 
-      const acc = {}
-      for (const key in doc) {
-        if (key === '_id') {
-          acc[key] = doc[key]
-          continue
-        }
-        acc[key] = await processValueUnknownType(doc[key], key)
+    const acc = {}
+    for (const key in doc) {
+      if (key === '_id') {
+        acc[key] = doc[key]
+        continue
       }
-      return resolve(acc)
-    })
+      acc[key] = await processValueUnknownType(doc[key], key)
+    }
+    return acc
+  }
 
   return {
     processDocuments: docs => Promise.all(docs.map(processDocument))
   }
 }
+
+export default DocumentProcessor

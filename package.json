@@ -14,17 +14,24 @@
   "engines": {
     "node": ">=12"
   },
-  "main": "src/node.js",
-  "browser": "src/browser.js",
+  "source": "./src/node.ts",
+  "main": "./dist/node.js",
+  "browser": "./dist/browser.js",
+  "exports": {
+    "require": "./dist/browser.cjs",
+    "default": "./dist/browser.modern.js",
+    "node": "./dist/node.modern.js"
+  },
+  "module": "./dist/browser.module.js",
+  "unpkg": "./dist/browser.umd.js",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "directories": {
     "lib": "src"
   },
   "scripts": {
-    "build": "npm run empty-sandbox && rm -rf ./dist/* && webpack && cp dist/search-index-$npm_package_version.js dist/search-index.js",
+    "build": "npm run empty-sandbox && rm -rf ./dist/* && microbundle",
     "demo-export": "node demo/generate-index/export.js",
     "demo-fetch": "node demo/generate-index/fetch.js",
     "demo-process": "node demo/generate-index/process.js",
@@ -49,11 +56,14 @@
   },
   "homepage": "https://fergiemcdowall.github.io/search-index/",
   "devDependencies": {
+    "@types/abstract-leveldown": "^7.2.0",
+    "abstract-leveldown": "^7.2.0",
     "assert": "^2.0.0",
     "doctoc": "^2.2.0",
     "fuzzyset": "1.0.5",
     "http-server": "14.1.0",
     "memory-level": "^1.0.0",
+    "microbundle": "^0.15.0",
     "open-cli": "^7.0.1",
     "os-browserify": "^0.3.0",
     "path": "^0.12.7",
@@ -65,6 +75,7 @@
     "stream-browserify": "^3.0.0",
     "tape": "^5.5.3",
     "tape-run": "^10.0.0",
+    "typescript": "^4.7.4",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2",
     "world-bank-dataset": "^1.0.0"

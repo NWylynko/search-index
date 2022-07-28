@@ -1,6 +1,11 @@
-const DocumentProcessor = require('./DocumentProcessor')
+import DocumentProcessor from './DocumentProcessor'
+import type { SearchIndexOptions } from './types'
+import type LRU from 'lru-cache'
+import type PQueue from 'p-queue'
+import type { QueueAddOptions } from 'p-queue'
+import type PriorityQueue from 'p-queue/dist/priority-queue'
 
-module.exports = (ops, cache, queue) => {
+const write = (ops: SearchIndexOptions, cache: LRU<unknown, unknown>, queue: PQueue<PriorityQueue, QueueAddOptions>) => {
   const incrementDocCount = increment =>
     ops.fii.STORE.get(['DOCUMENT_COUNT'])
       .then(count => ops.fii.STORE.put(['DOCUMENT_COUNT'], +count + increment))
@@ -88,3 +93,5 @@ module.exports = (ops, cache, queue) => {
     _INCREMENT_DOC_COUNT: incrementDocCount
   }
 }
+
+export default write;
